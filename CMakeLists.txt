@@ -120,6 +120,39 @@ endif ()
 include(protogen.cmake)
 include(ExternalProject)
 
+ExternalProject_Add(nuraft
+  URL
+  https://github.com/eBay/NuRaft/archive/refs/tags/v2.1.0.tar.gz
+  URL_HASH
+  MD5=46a3da6e038e9347cb33f714ac52c541
+  DOWNLOAD_NO_PROGRESS
+  1
+  UPDATE_COMMAND
+  "./prepare.sh"
+  LOG_CONFIGURE
+  1
+  LOG_BUILD
+  1
+  LOG_INSTALL
+  1
+  CMAKE_ARGS
+  -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
+  -DCMAKE_BUILD_TYPE=${LIB_BUILD_TYPE}
+  BUILD_ALWAYS
+  1
+  BUILD_COMMAND
+  make -j${CPU_CORE}
+)
+
+if(${LIB_BUILD_TYPE} STREQUAL DEBUG)
+  set(NURAFT libnuraft_debug.a)
+else()
+  set(NURAFT libnuraft.a)
+endif()
+set(NURAFT_LIBRARY ${INSTALL_LIBDIR}/${LIB_NURAFT})
+set(NURAFT_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+
+
 ExternalProject_Add(gtest
   URL
   https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz
@@ -738,6 +771,7 @@ target_link_directories(${PROJECT_NAME}
   PUBLIC ${INSTALL_LIBDIR})
 
 add_dependencies(${PROJECT_NAME}
+  nuraft
   gflags
   gtest
   ${LIBUNWIND_NAME}
@@ -766,6 +800,7 @@ target_link_libraries(${PROJECT_NAME}
   net
   pstd
   ${GLOG_LIBRARY}
+  libnuraft.a
   librocksdb.a
   ${LIB_PROTOBUF}
   ${LIB_GFLAGS}

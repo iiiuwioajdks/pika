@@ -15,7 +15,7 @@
 #include "include/pika_rm.h"
 #include "include/pika_server.h"
 #include "include/pika_version.h"
-
+#include "include/nuraft.h"
 #include "pstd/include/env.h"
 #include "pstd/include/pstd_defer.h"
 
